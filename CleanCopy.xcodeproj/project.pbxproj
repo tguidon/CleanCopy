@@ -12,6 +12,7 @@
 		E871B1EE244CD4650005F96D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E871B1ED244CD4650005F96D /* Assets.xcassets */; };
 		E871B1F1244CD4650005F96D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E871B1EF244CD4650005F96D /* Main.storyboard */; };
 		E871B1FD244CD4650005F96D /* CleanCopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E871B1FC244CD4650005F96D /* CleanCopyTests.swift */; };
+		E871B208244CE4A50005F96D /* PasteboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E871B207244CE4A50005F96D /* PasteboardManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +36,7 @@
 		E871B1F8244CD4650005F96D /* CleanCopyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleanCopyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E871B1FC244CD4650005F96D /* CleanCopyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanCopyTests.swift; sourceTree = "<group>"; };
 		E871B1FE244CD4650005F96D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E871B207244CE4A50005F96D /* PasteboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteboardManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +79,7 @@
 			isa = PBXGroup;
 			children = (
 				E871B1E9244CD4640005F96D /* AppDelegate.swift */,
+				E871B207244CE4A50005F96D /* PasteboardManager.swift */,
 				E871B1EB244CD4640005F96D /* ViewController.swift */,
 				E871B1ED244CD4650005F96D /* Assets.xcassets */,
 				E871B1EF244CD4650005F96D /* Main.storyboard */,
@@ -195,6 +198,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E871B208244CE4A50005F96D /* PasteboardManager.swift in Sources */,
 				E871B1EC244CD4640005F96D /* ViewController.swift in Sources */,
 				E871B1EA244CD4640005F96D /* AppDelegate.swift in Sources */,
 			);
