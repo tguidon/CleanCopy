@@ -8,6 +8,10 @@
 
 import Cocoa
 
+protocol PasteboardManagerDelegate {
+    func didDetectCleanedURL(urlString: String)
+}
+
 class PasteboardManager {
 
     internal let pasteboard: NSPasteboard!
@@ -15,6 +19,8 @@ class PasteboardManager {
     internal var timer: Timer?
 
     internal var lastItemInPasteboard: String? = nil
+
+    public var delegate: PasteboardManagerDelegate?
 
     init(pasteboard: NSPasteboard = .general) {
         self.pasteboard = pasteboard
@@ -24,7 +30,9 @@ class PasteboardManager {
         guard
             let item = pasteboard.pasteboardItems?.first?.string(forType: .string),
             item != lastItemInPasteboard,
-            let url = URL(string: item)
+            let url = URL(string: item),
+            url.scheme != nil,
+            url.host != nil
         else {
             return
         }
@@ -39,12 +47,15 @@ class PasteboardManager {
         components.host = url.host
         components.path = url.path
 
+
         if let cleanUrl = components.url {
             // cache item
             self.lastItemInPasteboard = cleanUrl.absoluteString
             // set pasteboard
             pasteboard.declareTypes([.string], owner: nil)
             pasteboard.setString(cleanUrl.absoluteString, forType: .string)
+
+            delegate?.didDetectCleanedURL(urlString: cleanUrl.absoluteString)
         }
     }
 

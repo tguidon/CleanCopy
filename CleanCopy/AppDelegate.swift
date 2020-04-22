@@ -16,16 +16,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     internal let pasteboardManager = PasteboardManager()
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        if let button = statusItem.button {
-            button.image = NSImage(named: NSImage.Name("StatusBarButtonImage"))
-        }
-
-        addMenu()
-
-        pasteboardManager.fire()
+        addStatusItemMenu()
+        setupPasteboardManager()
     }
 
-    func addMenu() {
+    func addStatusItemMenu() {
+        if let button = statusItem.button {
+            let image = NSImage(named: NSImage.Name("StatusBarButtonImage"))
+            image?.isTemplate = true
+
+            button.image = image
+        }
+
         let menu = NSMenu()
         menu.addItem(NSMenuItem(title: "Copy Last URL", action: #selector(copyLastCleanedURL), keyEquivalent: "p"))
         menu.addItem(NSMenuItem.separator())
@@ -38,5 +40,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         pasteboardManager.copyLastCleanedURL()
     }
 
+    func setupPasteboardManager() {
+        pasteboardManager.delegate = self
+        pasteboardManager.fire()
+    }
+
 }
 
+extension AppDelegate: PasteboardManagerDelegate {
+
+    func didDetectCleanedURL(urlString: String) {
+        print(urlString)
+        animateDetectedState()
+    }
+
+    func animateDetectedState() {
+        self.statusItem.button?.contentTintColor = NSColor.controlAccentColor
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            self.statusItem.button?.contentTintColor = nil
+        }
+    }
+}
