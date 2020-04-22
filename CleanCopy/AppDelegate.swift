@@ -20,12 +20,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     internal let urlAbsoluteStringKey = "url_absolute_string"
 
+    // MARK: - App Lifecycle
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         addStatusItemMenu()
         setupPasteboardManager()
 
         notificationCenter.delegate = self
+        notificationCenter.requestAuthorization(options: .alert) { (granted, error) in
+            if granted {
+                print("Granted")
+            } else {
+                print("Did not grant")
+            }
+        }
     }
+
+    // MARK: - Setup
 
     func addStatusItemMenu() {
         if let button = statusItem.button {
@@ -87,5 +98,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         if let urlAbsoluteString = userInfo[urlAbsoluteStringKey] as? String {
             pasteboardManager.copyToPasteboard(item: urlAbsoluteString)
         }
+
+        completionHandler()
     }
 }

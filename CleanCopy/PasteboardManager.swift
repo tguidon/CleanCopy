@@ -80,10 +80,11 @@ class PasteboardManager {
         components.path = url.path
 
         guard let cleanUrl = components.url else { return }
+        // The clean version matches what we tried to clean, no need to notify
+        guard cleanUrl != url else { return }
 
         // Send delegate to interact with UI
         delegate?.didDetectCleanedURL(url: cleanUrl)
     }
-
 
 }
