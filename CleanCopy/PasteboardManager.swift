@@ -9,7 +9,7 @@
 import Cocoa
 
 protocol PasteboardManagerDelegate {
-    func didDetectCleanedURL(urlString: String)
+    func didDetectCleanedURL(url: URL)
 }
 
 class PasteboardManager {
@@ -22,56 +22,68 @@ class PasteboardManager {
 
     public var delegate: PasteboardManagerDelegate?
 
-    init(pasteboard: NSPasteboard = .general) {
+    public init(pasteboard: NSPasteboard = .general) {
         self.pasteboard = pasteboard
     }
 
-    func checkPasteboardForTrackingInfo() {
-        guard
-            let item = pasteboard.pasteboardItems?.first?.string(forType: .string),
-            item != lastItemInPasteboard,
-            let url = URL(string: item),
-            url.scheme != nil,
-            url.host != nil
-        else {
-            return
-        }
+    // MARK: - Public API Methods
 
-        clean(url: url)
-    }
-
-    func clean(url: URL) {
-        // make new components
-        var components = URLComponents()
-        components.scheme = url.scheme
-        components.host = url.host
-        components.path = url.path
-
-
-        if let cleanUrl = components.url {
-            // cache item
-            self.lastItemInPasteboard = cleanUrl.absoluteString
-            // set pasteboard
-            pasteboard.declareTypes([.string], owner: nil)
-            pasteboard.setString(cleanUrl.absoluteString, forType: .string)
-
-            delegate?.didDetectCleanedURL(urlString: cleanUrl.absoluteString)
-        }
-    }
-
-    func fire() {
+    public func fire() {
         timer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
-            self.checkPasteboardForTrackingInfo()
+            self.checkPasteboardForURLToClean()
         }
 
         timer?.fire()
     }
 
-    func copyLastCleanedURL() {
+    public func copyLastCleanedURL() {
         if let item = self.lastItemInPasteboard {
             pasteboard.declareTypes([.string], owner: nil)
             pasteboard.setString(item, forType: .string)
         }
     }
+
+    public func copyToPasteboard(item: String) {
+        pasteboard.declareTypes([.string], owner: nil)
+        pasteboard.setString(item, forType: .string)
+    }
+
+    // MARK: - Internal Methods
+
+    internal func checkPasteboardForURLToClean() {
+        guard let url = urlInPasteboard else { return }
+
+        cleanQueryParamas(fromUrl: url)
+    }
+
+    internal var urlInPasteboard: URL? {
+        // Ensure there is an item in the pasteboard and it is not our last item
+        guard let item = pasteboard.pasteboardItems?.first?.string(forType: .string), item != lastItemInPasteboard else {
+            return nil
+        }
+
+        // Cache item
+        self.lastItemInPasteboard = item
+
+        // Cast to a URL, and ensure there is a scheme and host
+        guard let url = URL(string: item), url.scheme != nil, url.host != nil else {
+            return nil
+        }
+
+        return url
+    }
+
+    internal func cleanQueryParamas(fromUrl url: URL) {
+        var components = URLComponents()
+        components.scheme = url.scheme
+        components.host = url.host
+        components.path = url.path
+
+        guard let cleanUrl = components.url else { return }
+
+        // Send delegate to interact with UI
+        delegate?.didDetectCleanedURL(url: cleanUrl)
+    }
+
 
 }

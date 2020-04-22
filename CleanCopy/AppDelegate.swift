@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import UserNotifications
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -15,9 +16,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     internal let pasteboardManager = PasteboardManager()
 
+    internal let notificationCenter = UNUserNotificationCenter.current()
+
+    internal let urlAbsoluteStringKey = "url_absolute_string"
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         addStatusItemMenu()
         setupPasteboardManager()
+
+        notificationCenter.delegate = self
     }
 
     func addStatusItemMenu() {
@@ -48,17 +55,37 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 extension AppDelegate: PasteboardManagerDelegate {
-
-    func didDetectCleanedURL(urlString: String) {
-        print(urlString)
-        animateDetectedState()
+    func didDetectCleanedURL(url: URL) {
+        showConfirmCopyNotification(forUrl: url)
     }
 
-    func animateDetectedState() {
-        self.statusItem.button?.contentTintColor = NSColor.controlAccentColor
+    func showConfirmCopyNotification(forUrl url: URL) {
+        let content = UNMutableNotificationContent()
+        content.title = "New URL Cleaned"
+        content.subtitle = "Click here to copy"
+        content.body = url.absoluteString
+        content.userInfo[urlAbsoluteStringKey] = url.absoluteString
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            self.statusItem.button?.contentTintColor = nil
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+
+        let request = UNNotificationRequest(
+            identifier: url.absoluteString, content: content, trigger: trigger
+        )
+
+        notificationCenter.add(request) { error in
+            if error != nil {
+                dump(error!)
+            }
+        }
+    }
+}
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
+
+        if let urlAbsoluteString = userInfo[urlAbsoluteStringKey] as? String {
+            pasteboardManager.copyToPasteboard(item: urlAbsoluteString)
         }
     }
 }
