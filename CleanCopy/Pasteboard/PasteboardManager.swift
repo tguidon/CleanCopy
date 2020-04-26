@@ -16,17 +16,25 @@ class PasteboardManager {
 
     internal let pasteboard: NSPasteboard!
 
+    /// Timer use to continuously check for new pasteboard data
     internal var timer: Timer?
 
+    /// Last item we saw in the pasteboard
     internal var lastItemInPasteboard: String? = nil
 
     public var delegate: PasteboardManagerDelegate?
+
+    // MARK: - Init
 
     public init(pasteboard: NSPasteboard = .general) {
         self.pasteboard = pasteboard
     }
 
     // MARK: - Public API Methods
+
+    public func clearContents() {
+        pasteboard.clearContents()
+    }
 
     public func startRepeatingTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
@@ -36,28 +44,19 @@ class PasteboardManager {
         timer?.fire()
     }
 
-    public func copyLastItemInPasteboard() {
-        if let item = self.lastItemInPasteboard {
-            pasteboard.declareTypes([.string], owner: nil)
-            pasteboard.setString(item, forType: .string)
-        }
-    }
-
     public func copyToPasteboard(item: String) {
         pasteboard.declareTypes([.string], owner: nil)
         pasteboard.setString(item, forType: .string)
-    }
-
-    public func clearContents() {
-        pasteboard.clearContents()
     }
 
     // MARK: - Internal Methods
 
     internal func checkPasteboardForURLToClean() {
         guard let url = urlInPasteboard else { return }
+        guard let cleanURL = cleanURL(fromURL: url) else { return }
 
-        cleanQueryParamas(fromUrl: url)
+        // Send delegate to interact with UI
+        delegate?.didDetectCleanedURL(url: cleanURL)
     }
 
     internal var urlInPasteboard: URL? {
@@ -77,18 +76,17 @@ class PasteboardManager {
         return url
     }
 
-    internal func cleanQueryParamas(fromUrl url: URL) {
+    internal func cleanURL(fromURL url: URL) -> URL? {
         var components = URLComponents()
         components.scheme = url.scheme
         components.host = url.host
         components.path = url.path
 
-        guard let cleanUrl = components.url else { return }
-        // The clean version matches what we tried to clean, no need to notify
-        guard cleanUrl != url else { return }
+        guard let cleanUrl = components.url else { return nil }
 
-        // Send delegate to interact with UI
-        delegate?.didDetectCleanedURL(url: cleanUrl)
+        guard cleanUrl.absoluteString != url.absoluteStringWithNoTrailingSlash else { return nil }
+
+        return cleanUrl
     }
 
 }

@@ -18,53 +18,72 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     internal let notificationCenter = UNUserNotificationCenter.current()
 
-    internal let urlAbsoluteStringKey = "url_absolute_string"
-    internal let notificationsPrefPanePath = "/System/Library/PreferencePanes/Notifications.prefPane"
+    internal let popover: NSPopover = {
+        let popover = NSPopover()
+        popover.contentViewController = MenuViewController()
+        popover.contentSize = NSSize(width: 300, height: 140)
+        return popover
+    }()
 
     // MARK: - App Lifecycle
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        addStatusItemMenu()
+        setupStatusItem()
         setupPasteboardManager()
         setupUserNotificationCenter()
 
         checkNotificationSettings { success in
-            guard !success else { return }
-            self.promptToUpdateNotificationSettings()
+            if !success {
+                self.presentPopoverMenuViewController()
+            }
         }
     }
 
     // MARK: - Setup
 
-    internal func addStatusItemMenu() {
+    internal func setupStatusItem() {
         if let button = statusItem.button {
             let image = NSImage(named: NSImage.Name("StatusBarButtonImage"))
             image?.isTemplate = true
-
             button.image = image
+
+            button.action = #selector(togglePopover(_:))
         }
-
-        let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "Copy Last Item", action: #selector(copyLastItemInPasteboard), keyEquivalent: "c"))
-        menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
-
-        statusItem.menu = menu
-    }
-
-    @objc func copyLastItemInPasteboard() {
-        pasteboardManager.copyLastItemInPasteboard()
     }
 
     internal func setupPasteboardManager() {
         pasteboardManager.delegate = self
-        pasteboardManager.clearContents()
+
         pasteboardManager.startRepeatingTimer()
     }
 
     internal func setupUserNotificationCenter() {
         notificationCenter.delegate = self
     }
+
+    // MARK: - Popover
+
+    @objc internal func togglePopover(_ sender: Any?) {
+        popover.isShown ? closePopover(sender: sender) : showPopover(sender: sender)
+    }
+
+    internal func showPopover(sender: Any?) {
+        guard let button = statusItem.button else { return }
+
+        DispatchQueue.main.async {
+            self.popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        }
+    }
+
+    internal func closePopover(sender: Any?) {
+        popover.performClose(sender)
+    }
+
+    internal func presentPopoverMenuViewController() {
+        showPopover(sender: nil)
+    }
+
+    // MARK: - UNNotification
 
     internal func checkNotificationSettings(completionHandler: @escaping (_ success: Bool) -> ()) {
         notificationCenter.getNotificationSettings { notificationSettings in
@@ -93,37 +112,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    internal func showConfirmCopyNotification(forUrl url: URL) {
-        let request = buildNotificationRequest(forUrl: url)
-
-        notificationCenter.add(request) { error in
-            if error != nil {
-                dump(error!)
-            }
-        }
-    }
-
-    internal func buildNotificationRequest(forUrl url: URL) -> UNNotificationRequest {
-        let content = UNMutableNotificationContent()
-        content.title = "New URL Cleaned"
-        content.subtitle = "Click here to copy"
-        content.body = url.absoluteString
-        content.userInfo[urlAbsoluteStringKey] = url.absoluteString
-
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
-
-        return UNNotificationRequest(
-            identifier: url.absoluteString, content: content, trigger: trigger
-        )
-    }
-
-    internal func promptToUpdateNotificationSettings() {
-        // Open a view with a button to open settings
-        print("promptToUpdateNotificationSettings")
-
-        NSWorkspace.shared.open(URL(fileURLWithPath: notificationsPrefPanePath))
-    }
-
 }
 
 extension AppDelegate: PasteboardManagerDelegate {
@@ -131,21 +119,34 @@ extension AppDelegate: PasteboardManagerDelegate {
     func didDetectCleanedURL(url: URL) {
         checkNotificationSettings { success in
             guard success else {
-                self.promptToUpdateNotificationSettings()
+                self.presentPopoverMenuViewController()
                 return
             }
 
             self.showConfirmCopyNotification(forUrl: url)
         }
     }
+
+    internal func showConfirmCopyNotification(forUrl url: URL) {
+        let request = UNNotificationRequest.build(forUrl: url)
+
+        notificationCenter.add(request) { error in
+            // Handle or log?
+            if let error = error {
+                dump(error)
+            }
+        }
+    }
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
 
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        let userInfo = response.notification.request.content.userInfo
-
-        if let urlAbsoluteString = userInfo[urlAbsoluteStringKey] as? String {
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        if let urlAbsoluteString = response.notification.request.userInfoValue(forKey: .cleanedURLAbsoluteString) {
             pasteboardManager.copyToPasteboard(item: urlAbsoluteString)
         }
 
