@@ -19,26 +19,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     internal let notificationCenter = UNUserNotificationCenter.current()
 
     internal let urlAbsoluteStringKey = "url_absolute_string"
+    internal let notificationsPrefPanePath = "/System/Library/PreferencePanes/Notifications.prefPane"
 
     // MARK: - App Lifecycle
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         addStatusItemMenu()
         setupPasteboardManager()
+        setupUserNotificationCenter()
 
-        notificationCenter.delegate = self
-        notificationCenter.requestAuthorization(options: .alert) { (granted, error) in
-            if granted {
-                print("Granted")
-            } else {
-                print("Did not grant")
-            }
+        checkNotificationSettings { success in
+            guard !success else { return }
+            self.promptToUpdateNotificationSettings()
         }
     }
 
     // MARK: - Setup
 
-    func addStatusItemMenu() {
+    internal func addStatusItemMenu() {
         if let button = statusItem.button {
             let image = NSImage(named: NSImage.Name("StatusBarButtonImage"))
             image?.isTemplate = true
@@ -47,30 +45,65 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "Copy Last URL", action: #selector(copyLastCleanedURL), keyEquivalent: "p"))
+        menu.addItem(NSMenuItem(title: "Copy Last Item", action: #selector(copyLastItemInPasteboard), keyEquivalent: "c"))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
 
         statusItem.menu = menu
     }
 
-    @objc func copyLastCleanedURL() {
-        pasteboardManager.copyLastCleanedURL()
+    @objc func copyLastItemInPasteboard() {
+        pasteboardManager.copyLastItemInPasteboard()
     }
 
-    func setupPasteboardManager() {
+    internal func setupPasteboardManager() {
         pasteboardManager.delegate = self
-        pasteboardManager.fire()
+        pasteboardManager.clearContents()
+        pasteboardManager.startRepeatingTimer()
     }
 
-}
-
-extension AppDelegate: PasteboardManagerDelegate {
-    func didDetectCleanedURL(url: URL) {
-        showConfirmCopyNotification(forUrl: url)
+    internal func setupUserNotificationCenter() {
+        notificationCenter.delegate = self
     }
 
-    func showConfirmCopyNotification(forUrl url: URL) {
+    internal func checkNotificationSettings(completionHandler: @escaping (_ success: Bool) -> ()) {
+        notificationCenter.getNotificationSettings { notificationSettings in
+            switch notificationSettings.authorizationStatus {
+            case .notDetermined:
+                self.requestAuthorization { success in
+                    completionHandler(success)
+                }
+            case .authorized, .provisional:
+                completionHandler(true)
+            case .denied:
+                completionHandler(false)
+            @unknown default:
+                completionHandler(false)
+            }
+        }
+    }
+
+    internal func requestAuthorization(completionHandler: @escaping (_ success: Bool) -> ()) {
+        notificationCenter.requestAuthorization(options: [.alert]) { (success, error) in
+            if let error = error {
+                print("Request Authorization Failed (\(error), \(error.localizedDescription))")
+            }
+
+            completionHandler(success)
+        }
+    }
+
+    internal func showConfirmCopyNotification(forUrl url: URL) {
+        let request = buildNotificationRequest(forUrl: url)
+
+        notificationCenter.add(request) { error in
+            if error != nil {
+                dump(error!)
+            }
+        }
+    }
+
+    internal func buildNotificationRequest(forUrl url: URL) -> UNNotificationRequest {
         let content = UNMutableNotificationContent()
         content.title = "New URL Cleaned"
         content.subtitle = "Click here to copy"
@@ -79,19 +112,36 @@ extension AppDelegate: PasteboardManagerDelegate {
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
 
-        let request = UNNotificationRequest(
+        return UNNotificationRequest(
             identifier: url.absoluteString, content: content, trigger: trigger
         )
+    }
 
-        notificationCenter.add(request) { error in
-            if error != nil {
-                dump(error!)
+    internal func promptToUpdateNotificationSettings() {
+        // Open a view with a button to open settings
+        print("promptToUpdateNotificationSettings")
+
+        NSWorkspace.shared.open(URL(fileURLWithPath: notificationsPrefPanePath))
+    }
+
+}
+
+extension AppDelegate: PasteboardManagerDelegate {
+
+    func didDetectCleanedURL(url: URL) {
+        checkNotificationSettings { success in
+            guard success else {
+                self.promptToUpdateNotificationSettings()
+                return
             }
+
+            self.showConfirmCopyNotification(forUrl: url)
         }
     }
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
+
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
 

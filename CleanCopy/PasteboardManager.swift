@@ -28,7 +28,7 @@ class PasteboardManager {
 
     // MARK: - Public API Methods
 
-    public func fire() {
+    public func startRepeatingTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { _ in
             self.checkPasteboardForURLToClean()
         }
@@ -36,7 +36,7 @@ class PasteboardManager {
         timer?.fire()
     }
 
-    public func copyLastCleanedURL() {
+    public func copyLastItemInPasteboard() {
         if let item = self.lastItemInPasteboard {
             pasteboard.declareTypes([.string], owner: nil)
             pasteboard.setString(item, forType: .string)
@@ -46,6 +46,10 @@ class PasteboardManager {
     public func copyToPasteboard(item: String) {
         pasteboard.declareTypes([.string], owner: nil)
         pasteboard.setString(item, forType: .string)
+    }
+
+    public func clearContents() {
+        pasteboard.clearContents()
     }
 
     // MARK: - Internal Methods
