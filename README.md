@@ -4,10 +4,10 @@
 
 
 
-I've never loved all the extra junk that comes along URLs. Tracking info, marketing campaign tags. I don't want it when I want to share a link.
+Copy a link, get a notifcation if it contains query params. Want to share the link without them? Click the notication and a clean link is in your pasteboard. Share links without tracking information.
 
-Run CleanCopy and it will begin scanning your clipboard, looking for links links. If a link with query params is found, a local notication is sent. Clicking on that will copy a stripped down URL, with no query params, to your clipboard.
+<img src="demo.gif">
 
-
+Run CleanCopy and it will begin scanning your clipboard for links with query params. If a link with query params is found, a local notication is sent. Clicking on that will copy a stripped down URL, with no query params, to your clipboard.
 
 <img src="notification.png" width="400">
