@@ -20,13 +20,13 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3wa-EV-euH">
-                    <rect key="frame" x="20" y="61" width="260" height="59"/>
+                    <rect key="frame" x="20" y="75" width="260" height="45"/>
                     <subviews>
-                        <stackView distribution="equalSpacing" orientation="horizontal" alignment="centerY" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eVr-2N-RY9">
-                            <rect key="frame" x="0.0" y="0.0" width="260" height="59"/>
+                        <stackView distribution="equalSpacing" orientation="vertical" alignment="centerX" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eVr-2N-RY9">
+                            <rect key="frame" x="0.0" y="0.0" width="260" height="45"/>
                             <subviews>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="eJq-ca-4m5">
-                                    <rect key="frame" x="-2" y="22" width="171" height="16"/>
+                                    <rect key="frame" x="45" y="29" width="171" height="16"/>
                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="Please enable notifications" id="jD1-cI-P3V">
                                         <font key="font" usesAppearanceFont="YES"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -34,7 +34,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gbS-tU-ucg">
-                                    <rect key="frame" x="175" y="12" width="91" height="32"/>
+                                    <rect key="frame" x="85" y="-7" width="91" height="32"/>
                                     <buttonCell key="cell" type="push" title="Settings" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="oEH-Pz-dI9">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -74,7 +74,7 @@
                 <constraint firstAttribute="trailing" secondItem="ktu-k8-UcP" secondAttribute="trailing" constant="20" id="JmE-cR-qea"/>
                 <constraint firstAttribute="trailing" secondItem="3wa-EV-euH" secondAttribute="trailing" constant="20" id="ZgZ-Uk-XUh"/>
                 <constraint firstItem="3wa-EV-euH" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" constant="20" id="isq-9J-BKq"/>
-                <constraint firstItem="ktu-k8-UcP" firstAttribute="top" secondItem="3wa-EV-euH" secondAttribute="bottom" constant="20" id="mAv-Fd-0Z6"/>
+                <constraint firstItem="ktu-k8-UcP" firstAttribute="top" relation="greaterThanOrEqual" secondItem="3wa-EV-euH" secondAttribute="bottom" constant="20" id="mAv-Fd-0Z6"/>
                 <constraint firstAttribute="bottom" secondItem="ktu-k8-UcP" secondAttribute="bottom" constant="20" id="ql9-h4-Wev"/>
             </constraints>
             <point key="canvasLocation" x="139" y="154"/>

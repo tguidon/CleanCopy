@@ -42,7 +42,7 @@ class MenuViewController: NSViewController {
         UNUserNotificationCenter.current().getNotificationSettings { notificationSettings in
             switch notificationSettings.authorizationStatus {
             case .notDetermined, .denied:
-                self.setContent(text: "Please enable notifications in system settings.")
+                self.setContent(text: "Please enable notifications in system notification settings.")
             default:
                 self.setContent(text: "Notifications enabled, enjoy 😎", enableButtonIsHidden: true)
             }

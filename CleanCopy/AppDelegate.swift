@@ -18,6 +18,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     internal let notificationCenter = UNUserNotificationCenter.current()
 
+    internal var eventMonitor: EventMonitor?
+
     internal let popover: NSPopover = {
         let popover = NSPopover()
         popover.contentViewController = MenuViewController()
@@ -31,6 +33,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setupStatusItem()
         setupPasteboardManager()
         setupUserNotificationCenter()
+        setupEventMonitor()
 
         checkNotificationSettings { success in
             if !success {
@@ -61,6 +64,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         notificationCenter.delegate = self
     }
 
+    internal func setupEventMonitor() {
+        eventMonitor = EventMonitor(mask: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
+            if let strongSelf = self, strongSelf.popover.isShown {
+                strongSelf.closePopover(sender: event)
+            }
+        }
+    }
+
     // MARK: - Popover
 
     @objc internal func togglePopover(_ sender: Any?) {
@@ -73,10 +84,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         DispatchQueue.main.async {
             self.popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         }
+
+        eventMonitor?.start()
     }
 
     internal func closePopover(sender: Any?) {
         popover.performClose(sender)
+
+        eventMonitor?.stop()
     }
 
     internal func presentPopoverMenuViewController() {

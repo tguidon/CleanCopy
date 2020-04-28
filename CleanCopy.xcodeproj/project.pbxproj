@@ -11,6 +11,7 @@
 		E871B1EE244CD4650005F96D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E871B1ED244CD4650005F96D /* Assets.xcassets */; };
 		E871B1F1244CD4650005F96D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E871B1EF244CD4650005F96D /* Main.storyboard */; };
 		E871B208244CE4A50005F96D /* PasteboardManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E871B207244CE4A50005F96D /* PasteboardManager.swift */; };
+		E897629B2457CA170056952E /* EventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E897629A2457CA170056952E /* EventMonitor.swift */; };
 		E8BAC2FD2456149700C6E793 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BAC2FB2456149700C6E793 /* MenuViewController.swift */; };
 		E8BAC2FE2456149700C6E793 /* MenuViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E8BAC2FC2456149700C6E793 /* MenuViewController.xib */; };
 		E8BAC300245629B900C6E793 /* UNNotificationRequest+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BAC2FF245629B900C6E793 /* UNNotificationRequest+Extensions.swift */; };
@@ -42,6 +43,7 @@
 		E871B1F8244CD4650005F96D /* CleanCopyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleanCopyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E871B1FE244CD4650005F96D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E871B207244CE4A50005F96D /* PasteboardManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteboardManager.swift; sourceTree = "<group>"; };
+		E897629A2457CA170056952E /* EventMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMonitor.swift; sourceTree = "<group>"; };
 		E8BAC2FB2456149700C6E793 /* MenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		E8BAC2FC2456149700C6E793 /* MenuViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MenuViewController.xib; sourceTree = "<group>"; };
 		E8BAC2FF245629B900C6E793 /* UNNotificationRequest+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UNNotificationRequest+Extensions.swift"; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				E871B1E9244CD4640005F96D /* AppDelegate.swift */,
+				E897629A2457CA170056952E /* EventMonitor.swift */,
 				E871B1ED244CD4650005F96D /* Assets.xcassets */,
 				E871B1F3244CD4650005F96D /* CleanCopy.entitlements */,
 				E8BAC30324562BBD00C6E793 /* Extensions */,
@@ -247,6 +250,7 @@
 				E871B208244CE4A50005F96D /* PasteboardManager.swift in Sources */,
 				E8BAC3072456477800C6E793 /* URL+Extensions.swift in Sources */,
 				E871B1EA244CD4640005F96D /* AppDelegate.swift in Sources */,
+				E897629B2457CA170056952E /* EventMonitor.swift in Sources */,
 				E8BAC2FD2456149700C6E793 /* MenuViewController.swift in Sources */,
 				E8BAC300245629B900C6E793 /* UNNotificationRequest+Extensions.swift in Sources */,
 			);
@@ -406,7 +410,7 @@
 				CODE_SIGN_ENTITLEMENTS = CleanCopy/CleanCopy.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 4ZMW5MD4WT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = CleanCopy/Info.plist;
@@ -414,6 +418,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.taylorguidon.CleanCopy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -427,7 +432,7 @@
 				CODE_SIGN_ENTITLEMENTS = CleanCopy/CleanCopy.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 4ZMW5MD4WT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = CleanCopy/Info.plist;
@@ -435,6 +440,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.taylorguidon.CleanCopy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
